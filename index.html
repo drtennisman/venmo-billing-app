@@ -1,0 +1,1961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#021f3d">
+    <title>IJTA Bruno Billing</title>
+    <link rel="icon" type="image/png" href="ijta-logo.png">
+    <link rel="apple-touch-icon" href="ijta-logo.png">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        /* ==================== HEADER ==================== */
+        .header {
+            background: linear-gradient(180deg, #052d54 0%, #021f3d 100%);
+            color: white;
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .header-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        .header-text {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .header h1 {
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            line-height: 1.2;
+        }
+
+        .header .subtitle {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 3px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        /* ==================== LAYOUT ==================== */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+
+        /* ==================== BACK BUTTON ==================== */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 6px 10px;
+            margin-right: 6px;
+            border-radius: 8px;
+            transition: background 0.15s;
+            flex-shrink: 0;
+        }
+
+        .back-btn:active {
+            background: rgba(255,255,255,0.12);
+        }
+
+        /* ==================== SECTION HEADERS ==================== */
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 24px 0 10px 0;
+        }
+
+        .section-title:first-child {
+            margin-top: 4px;
+        }
+
+        /* ==================== CARDS ==================== */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        /* ==================== BUTTONS ==================== */
+        .primary-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: #021f3d;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+            margin-top: 16px;
+        }
+
+        .primary-btn:active {
+            background: #011529;
+        }
+
+        .primary-btn:disabled {
+            background: #7a9ab8;
+            cursor: not-allowed;
+        }
+
+        /* ==================== FORM ELEMENTS ==================== */
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        select {
+            display: block;
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            color: #333;
+            background: white;
+            outline: none;
+            margin-bottom: 16px;
+            transition: border-color 0.15s;
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+        }
+
+        select:focus {
+            border-color: #021f3d;
+        }
+
+        /* ==================== LOADING / ERROR ==================== */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 40px 20px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #e0e0e0;
+            border-top-color: #021f3d;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-msg {
+            background: #fde8e8;
+            color: #c62828;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .error-msg.visible {
+            display: block;
+        }
+
+        /* ==================== TABLES ==================== */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            text-align: left;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            padding: 8px 12px;
+            border-bottom: 2px solid #e0e0e0;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+        }
+
+        th.money, td.money {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        th.center, td.center {
+            text-align: center;
+        }
+
+        tfoot td {
+            font-weight: 700;
+            border-top: 2px solid #e0e0e0;
+            border-bottom: none;
+        }
+
+        /* Row highlighting */
+        tr.has-balance td {
+            background: #fff8e1;
+        }
+
+        tr.has-balance td.balance {
+            color: #e65100;
+            font-weight: 600;
+        }
+
+        tr.paid-up td.balance {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        /* ==================== FILE UPLOAD ==================== */
+        .file-upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
+        }
+
+        .file-upload-area:hover,
+        .file-upload-area.dragover {
+            border-color: #021f3d;
+            background: #f0f4f8;
+            color: #333;
+        }
+
+        .file-upload-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .upload-label {
+            font-size: 14px;
+        }
+
+        .file-name-display {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        /* ==================== PAID INPUT ==================== */
+        .paid-input {
+            width: 90px;
+            padding: 6px 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            text-align: right;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .paid-input:focus {
+            border-color: #021f3d;
+        }
+
+        .paid-input.error {
+            border-color: #e53935;
+            animation: shake 0.3s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        /* ==================== VENMO PAYMENTS TABLE ==================== */
+        .payment-note {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .bruno-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #021f3d;
+        }
+
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .filter-bar label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: none;
+            font-weight: 500;
+            color: #555;
+            cursor: pointer;
+            margin-bottom: 0;
+            font-size: 13px;
+        }
+
+        .filter-bar input[type="checkbox"] {
+            accent-color: #021f3d;
+        }
+
+        .payments-total {
+            background: #e8eef5;
+            padding: 10px 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        .payments-total strong {
+            color: #021f3d;
+        }
+
+        /* ==================== VENMO REQUESTS ==================== */
+        .request-item {
+            padding: 14px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .request-item:last-child {
+            border-bottom: none;
+        }
+
+        .request-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .request-player {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .request-amount {
+            color: #e65100;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .request-message {
+            font-size: 13px;
+            color: #555;
+            background: #f5f5f5;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin-bottom: 8px;
+        }
+
+        .copy-btn {
+            padding: 8px 16px;
+            background: #e8eef5;
+            color: #021f3d;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .copy-btn:active {
+            background: #d0dce8;
+        }
+
+        .copy-btn.copied {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        /* ==================== HELP TEXT ==================== */
+        .help-text {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 12px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* ==================== MONTH SELECTOR CARD ==================== */
+        .month-card {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .month-card .selects-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .month-card .selects-row > div {
+            flex: 1;
+        }
+
+        .month-card .selects-row select {
+            width: 100%;
+            margin-bottom: 0;
+        }
+
+        .month-card label {
+            text-align: left;
+        }
+
+        .welcome-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .welcome-text {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        /* ==================== PAYMENT RULES BUTTON ==================== */
+        .rules-btn {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            font-size: 18px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.15s;
+        }
+
+        .rules-btn:active {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* ==================== MODAL ==================== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #021f3d;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .modal-close:active {
+            background: #f0f0f0;
+        }
+
+        .modal-help {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        /* ==================== RULE FORM ==================== */
+        .rule-form {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .rule-form-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .rule-form-field {
+            flex: 1;
+        }
+
+        .rule-form-field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .rule-form-field input,
+        .rule-form-field select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            background: white;
+        }
+
+        .rule-form-field input:focus,
+        .rule-form-field select:focus {
+            outline: none;
+            border-color: #021f3d;
+        }
+
+        .rule-add-btn {
+            margin-top: 12px;
+            padding: 10px;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        /* ==================== RULES LIST ==================== */
+        .rule-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .rule-item:last-child {
+            border-bottom: none;
+        }
+
+        .rule-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .rule-from {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .rule-arrow {
+            color: #999;
+            font-size: 16px;
+        }
+
+        .rule-player {
+            color: #021f3d;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .rule-delete {
+            background: none;
+            border: none;
+            color: #c62828;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .rule-delete:active {
+            background: #fde8e8;
+        }
+
+        .rules-empty {
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+            padding: 16px 0;
+        }
+
+        /* ==================== CREATE RULE LINK ==================== */
+        .create-rule-link {
+            background: #e8eef5;
+            color: #021f3d;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .create-rule-link:active {
+            background: #d0dce8;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 600px) {
+            .header {
+                padding: 12px 12px;
+            }
+
+            .header-inner {
+                gap: 8px;
+            }
+
+            .header-logo {
+                width: 36px;
+                height: 36px;
+                border-width: 2px;
+            }
+
+            .header h1 {
+                font-size: 16px;
+            }
+
+            .back-btn {
+                font-size: 13px;
+                padding: 4px 8px;
+            }
+
+            .rules-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+
+            .container {
+                padding: 12px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            td, th {
+                padding: 8px 8px;
+                font-size: 13px;
+            }
+
+            .paid-input {
+                width: 70px;
+                font-size: 13px;
+            }
+
+            .payment-note {
+                max-width: 120px;
+            }
+
+            .modal-content {
+                padding: 16px;
+            }
+
+            .rule-form-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== SCREEN 1: MONTH SELECTION ==================== -->
+    <div id="month-screen" class="screen active">
+        <div class="header">
+            <div class="header-inner">
+                <img src="ijta-logo.png" alt="IJTA" class="header-logo">
+                <div class="header-text">
+                    <h1>Venmo Billing</h1>
+                    <div class="subtitle">Bruno Clinic</div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="card month-card">
+                <div class="welcome-icon">$</div>
+                <div class="welcome-text">
+                    Reconcile Bruno Clinic attendance with Venmo payments.<br>
+                    Select a month to get started.
+                </div>
+                <div class="selects-row">
+                    <div>
+                        <label for="month-select">Month</label>
+                        <select id="month-select"></select>
+                    </div>
+                    <div>
+                        <label for="year-select">Year</label>
+                        <select id="year-select"></select>
+                    </div>
+                </div>
+                <button id="load-btn" class="primary-btn" onclick="loadBillingData()">Load Billing Data</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SCREEN 2: BILLING DASHBOARD ==================== -->
+    <div id="dashboard-screen" class="screen">
+        <div class="header">
+            <div class="header-inner">
+                <button class="back-btn" onclick="showMonthScreen()">&#8592; Back</button>
+                <img src="ijta-logo.png" alt="IJTA" class="header-logo">
+                <div class="header-text">
+                    <h1>Bruno Billing</h1>
+                    <div class="subtitle" id="billing-period"></div>
+                </div>
+                <button class="rules-btn" onclick="openRulesModal()" title="Payment Rules">&#9881;</button>
+            </div>
+        </div>
+        <div class="container">
+
+            <!-- Section A: Attendance Summary -->
+            <div class="section-title">Attendance Summary</div>
+            <div id="attendance-loading" class="loading" style="display:none;">
+                <div class="spinner"></div>
+                <div>Loading attendance data...</div>
+            </div>
+            <div id="attendance-error" class="error-msg"></div>
+            <div class="card" id="attendance-card" style="display:none;">
+                <div class="table-wrapper">
+                    <table id="attendance-table">
+                        <thead>
+                            <tr>
+                                <th>Player Name</th>
+                                <th class="center">Sessions</th>
+                                <th class="money">Total Owed</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-body"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td>TOTAL</td>
+                                <td class="center" id="total-sessions">0</td>
+                                <td class="money" id="total-owed">$0.00</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Section B: Venmo Payments -->
+            <div class="section-title">Venmo Payments</div>
+            <div class="card" id="venmo-upload-card">
+                <p class="help-text">Upload your Venmo CSV statement to see payments received.</p>
+                <div class="file-upload-area" id="drop-zone">
+                    <input type="file" id="venmo-file" accept=".csv" onchange="handleFileUpload(event)">
+                    <div class="upload-icon">&#128196;</div>
+                    <div class="upload-label">Click or drag Venmo CSV here</div>
+                    <div class="file-name-display" id="file-name" style="display:none;"></div>
+                </div>
+            </div>
+            <div id="venmo-parse-error" class="error-msg"></div>
+            <div class="card" id="venmo-payments-card" style="display:none;">
+                <div class="filter-bar">
+                    <label>
+                        <input type="checkbox" id="show-all-payments" onchange="renderPaymentsTable()">
+                        Show all payments (not just Bruno)
+                    </label>
+                    <span id="payment-count"></span>
+                </div>
+                <div class="table-wrapper">
+                    <table id="payments-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>From</th>
+                                <th>Note</th>
+                                <th class="money">Amount</th>
+                                <th class="center">Bruno</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="payments-body"></tbody>
+                    </table>
+                </div>
+                <div class="payments-total">
+                    Bruno Payments Total: <strong id="bruno-payments-total">$0.00</strong>
+                </div>
+            </div>
+
+            <!-- Section C: Reconciliation -->
+            <div class="section-title">Reconciliation</div>
+            <div class="card" id="reconciliation-card">
+                <div id="recon-empty" class="empty-state">
+                    Load attendance data above to see reconciliation.
+                </div>
+                <div id="recon-content" style="display:none;">
+                    <div class="table-wrapper">
+                        <table id="reconciliation-table">
+                            <thead>
+                                <tr>
+                                    <th>Player</th>
+                                    <th class="money">Owed</th>
+                                    <th class="money">Paid</th>
+                                    <th class="money">Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reconciliation-body"></tbody>
+                            <tfoot>
+                                <tr>
+                                    <td>TOTALS</td>
+                                    <td class="money" id="recon-total-owed">$0.00</td>
+                                    <td class="money" id="recon-total-paid">$0.00</td>
+                                    <td class="money" id="recon-total-balance">$0.00</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section D: Venmo Requests -->
+            <div class="section-title">Venmo Requests</div>
+            <div class="card" id="requests-card">
+                <div id="requests-empty" class="empty-state">
+                    Reconciliation will appear after loading attendance data.
+                </div>
+                <div id="requests-content" style="display:none;">
+                    <div id="requests-list"></div>
+                    <button id="copy-all-btn" class="primary-btn" onclick="copyAllRequests()" style="display:none;">
+                        Copy All Requests
+                    </button>
+                    <div id="all-paid-msg" class="empty-state" style="display:none;">
+                        All players are paid up! No requests needed.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Payment Rules Modal -->
+        <div id="rules-modal" class="modal-overlay" style="display:none;" onclick="closeRulesModalOutside(event)">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Payment Rules</h2>
+                    <button class="modal-close" onclick="closeRulesModal()">&times;</button>
+                </div>
+                <p class="modal-help">
+                    When a Venmo sender has a different name than the player, add a rule so payments are matched automatically.
+                </p>
+
+                <!-- Add new rule form -->
+                <div class="rule-form">
+                    <div class="rule-form-row">
+                        <div class="rule-form-field">
+                            <label for="rule-venmo-name">Venmo Sender Name</label>
+                            <input type="text" id="rule-venmo-name" placeholder="e.g. Jane Smith">
+                        </div>
+                        <div class="rule-form-field">
+                            <label for="rule-player-name">Apply to Player</label>
+                            <select id="rule-player-name">
+                                <option value="">-- Select Player --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="primary-btn rule-add-btn" onclick="addPaymentRule()">Add Rule</button>
+                </div>
+
+                <!-- Existing rules list -->
+                <div id="rules-list"></div>
+
+                <!-- Empty state -->
+                <div id="rules-empty" class="rules-empty">
+                    No rules yet. Add one above to auto-match payments.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ==================== CONFIGURATION ====================
+        const ATTENDANCE_SHEET_ID = '1ipQEh5KCRywBOin8GM4xjzvGh9iK1YWp8VD9BXGH_YA';
+        const SESSION_RATE = 20;
+
+        const MONTH_NAMES = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+
+        // ==================== STATE ====================
+        let selectedMonth = '';        // e.g., "February 2026"
+        let attendanceData = [];       // [{ playerName, sessions, owed }]
+        let venmoPayments = [];        // [{ date, from, note, amount, isBruno }]
+        let reconciliation = {};       // { playerName: { owed, paid, balance } }
+        let paymentRules = [];         // [{ venmoName, playerName }] — saved in localStorage
+        let unmatchedBrunoPayments = []; // Bruno payments not matched by any pass
+
+        // ==================== LOCALSTORAGE HELPERS ====================
+        function loadPaymentRules() {
+            try {
+                const saved = localStorage.getItem('ijtaBillingPaymentRules');
+                paymentRules = saved ? JSON.parse(saved) : [];
+            } catch (e) {
+                paymentRules = [];
+            }
+        }
+
+        function savePaymentRules() {
+            localStorage.setItem('ijtaBillingPaymentRules', JSON.stringify(paymentRules));
+        }
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            populateMonthSelects();
+            setupDragDrop();
+            loadPaymentRules();
+        });
+
+        function populateMonthSelects() {
+            const now = new Date();
+            const monthSelect = document.getElementById('month-select');
+            const yearSelect = document.getElementById('year-select');
+
+            // Months
+            MONTH_NAMES.forEach((name, i) => {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = name;
+                if (i === now.getMonth()) opt.selected = true;
+                monthSelect.appendChild(opt);
+            });
+
+            // Years (current year - 1 through current year + 1)
+            for (let y = now.getFullYear() - 1; y <= now.getFullYear() + 1; y++) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                if (y === now.getFullYear()) opt.selected = true;
+                yearSelect.appendChild(opt);
+            }
+        }
+
+        function setupDragDrop() {
+            const dropZone = document.getElementById('drop-zone');
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file && file.name.endsWith('.csv')) {
+                    readVenmoFile(file);
+                }
+            });
+        }
+
+        // ==================== SCREEN MANAGEMENT ====================
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function showMonthScreen() {
+            showScreen('month-screen');
+        }
+
+        function showDashboardScreen() {
+            showScreen('dashboard-screen');
+        }
+
+        // ==================== DATA LOADING ====================
+        async function loadBillingData() {
+            const monthIndex = parseInt(document.getElementById('month-select').value);
+            const year = document.getElementById('year-select').value;
+            const monthName = MONTH_NAMES[monthIndex];
+            selectedMonth = `${monthName} ${year}`;
+
+            document.getElementById('billing-period').textContent = selectedMonth;
+            showDashboardScreen();
+
+            // Reset state
+            attendanceData = [];
+            venmoPayments = [];
+            reconciliation = {};
+
+            // Reset UI
+            document.getElementById('attendance-card').style.display = 'none';
+            document.getElementById('attendance-error').classList.remove('visible');
+            document.getElementById('attendance-loading').style.display = 'flex';
+            document.getElementById('venmo-payments-card').style.display = 'none';
+            document.getElementById('venmo-parse-error').classList.remove('visible');
+            document.getElementById('recon-empty').style.display = 'block';
+            document.getElementById('recon-content').style.display = 'none';
+            document.getElementById('requests-empty').style.display = 'block';
+            document.getElementById('requests-content').style.display = 'none';
+
+            // Reset file upload
+            document.getElementById('venmo-file').value = '';
+            document.getElementById('file-name').style.display = 'none';
+
+            // Fetch attendance
+            try {
+                const tabName = selectedMonth;
+                const url = `https://docs.google.com/spreadsheets/d/${ATTENDANCE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}`;
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`Could not load data (HTTP ${response.status})`);
+                }
+
+                const csvText = await response.text();
+
+                // Check if it's an error page (Google Sheets returns HTML for bad tabs)
+                if (csvText.trim().startsWith('<!DOCTYPE') || csvText.trim().startsWith('<html')) {
+                    throw new Error(`No attendance tab found for "${selectedMonth}". The tab may not exist yet.`);
+                }
+
+                const rows = parseAttendanceCSV(csvText);
+                const brunoRows = rows.filter(r => r.clinic.toLowerCase().includes('bruno'));
+
+                if (brunoRows.length === 0) {
+                    throw new Error(`No Bruno sessions found for ${selectedMonth}.`);
+                }
+
+                attendanceData = computeAttendanceSummary(brunoRows);
+                document.getElementById('attendance-loading').style.display = 'none';
+                renderAttendanceTable();
+                buildReconciliation();
+
+            } catch (error) {
+                console.error('Error loading attendance:', error);
+                document.getElementById('attendance-loading').style.display = 'none';
+                const errEl = document.getElementById('attendance-error');
+                errEl.textContent = error.message || 'Failed to load attendance data. Check your internet connection.';
+                errEl.classList.add('visible');
+            }
+        }
+
+        // ==================== CSV PARSING (Google Sheets) ====================
+        function parseCSVRow(row) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < row.length; i++) {
+                const char = row[i];
+                if (inQuotes) {
+                    if (char === '"') {
+                        if (i + 1 < row.length && row[i + 1] === '"') {
+                            current += '"';
+                            i++;
+                        } else {
+                            inQuotes = false;
+                        }
+                    } else {
+                        current += char;
+                    }
+                } else {
+                    if (char === '"') {
+                        inQuotes = true;
+                    } else if (char === ',') {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
+        function parseAttendanceCSV(csvText) {
+            const lines = csvText.split('\n');
+            const rows = [];
+
+            for (let i = 1; i < lines.length; i++) {  // Skip header
+                const line = lines[i].trim();
+                if (!line) continue;
+
+                const cols = parseCSVRow(line);
+                if (cols.length < 4) continue;
+
+                rows.push({
+                    date: cols[0] || '',
+                    clinic: cols[1] || '',
+                    coaches: cols[2] || '',
+                    playerName: cols[3] || '',
+                    status: cols[4] || ''
+                });
+            }
+
+            return rows;
+        }
+
+        function computeAttendanceSummary(brunoRows) {
+            const playerMap = {};
+
+            for (const row of brunoRows) {
+                const name = row.playerName.trim();
+                if (!name) continue;
+
+                // Count unique dates per player (in case of duplicates)
+                if (!playerMap[name]) {
+                    playerMap[name] = new Set();
+                }
+                playerMap[name].add(row.date);
+            }
+
+            const summary = [];
+            for (const [name, dates] of Object.entries(playerMap)) {
+                const sessions = dates.size;
+                summary.push({
+                    playerName: name,
+                    sessions: sessions,
+                    owed: sessions * SESSION_RATE
+                });
+            }
+
+            // Sort alphabetically by name
+            summary.sort((a, b) => a.playerName.localeCompare(b.playerName));
+            return summary;
+        }
+
+        // ==================== ATTENDANCE TABLE RENDERING ====================
+        function renderAttendanceTable() {
+            const tbody = document.getElementById('attendance-body');
+            tbody.innerHTML = '';
+
+            let totalSessions = 0;
+            let totalOwed = 0;
+
+            for (const player of attendanceData) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${escapeHTML(player.playerName)}</td>
+                    <td class="center">${player.sessions}</td>
+                    <td class="money">${formatCurrency(player.owed)}</td>
+                `;
+                tbody.appendChild(tr);
+                totalSessions += player.sessions;
+                totalOwed += player.owed;
+            }
+
+            document.getElementById('total-sessions').textContent = totalSessions;
+            document.getElementById('total-owed').textContent = formatCurrency(totalOwed);
+            document.getElementById('attendance-card').style.display = 'block';
+        }
+
+        // ==================== VENMO CSV UPLOAD & PARSING ====================
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                readVenmoFile(file);
+            }
+        }
+
+        function readVenmoFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    let text = e.target.result;
+                    // Strip BOM if present
+                    if (text.charCodeAt(0) === 0xFEFF) {
+                        text = text.slice(1);
+                    }
+
+                    venmoPayments = parseVenmoCSV(text);
+                    document.getElementById('venmo-parse-error').classList.remove('visible');
+
+                    // Show file name
+                    const fileNameEl = document.getElementById('file-name');
+                    fileNameEl.textContent = `Loaded: ${file.name}`;
+                    fileNameEl.style.display = 'block';
+
+                    renderPaymentsTable();
+                    autoSuggestPayments();
+                    renderReconciliation();
+                    renderRequests();
+
+                } catch (err) {
+                    console.error('Venmo CSV parse error:', err);
+                    const errEl = document.getElementById('venmo-parse-error');
+                    errEl.textContent = err.message || 'Could not parse the Venmo CSV. Please check the file.';
+                    errEl.classList.add('visible');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function parseVenmoCSV(csvText) {
+            // Venmo CSVs can have multi-line quoted fields (like the disclaimer).
+            // We need to handle this properly.
+            const records = [];
+            let current = '';
+            let inQuotes = false;
+            const lines = [];
+
+            // First, properly split into logical rows handling multi-line quoted fields
+            for (let i = 0; i < csvText.length; i++) {
+                const char = csvText[i];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                    current += char;
+                } else if ((char === '\n' || char === '\r') && !inQuotes) {
+                    if (current.trim()) {
+                        lines.push(current);
+                    }
+                    current = '';
+                    // Skip \r\n pair
+                    if (char === '\r' && i + 1 < csvText.length && csvText[i + 1] === '\n') {
+                        i++;
+                    }
+                } else {
+                    current += char;
+                }
+            }
+            if (current.trim()) {
+                lines.push(current);
+            }
+
+            if (lines.length < 2) {
+                throw new Error('The CSV file appears to be empty or invalid.');
+            }
+
+            // First line is the header
+            const headerCols = parseCSVRow(lines[0]);
+            const colMap = {};
+            headerCols.forEach((col, idx) => {
+                // Clean up column names (remove extra quotes)
+                const cleanName = col.replace(/^"+|"+$/g, '').trim();
+                colMap[cleanName] = idx;
+            });
+
+            // Verify it looks like a Venmo CSV
+            if (colMap['Type'] === undefined || colMap['Amount (total)'] === undefined) {
+                throw new Error('This does not appear to be a Venmo CSV statement. Expected columns like "Type" and "Amount (total)".');
+            }
+
+            // Parse data rows
+            const payments = [];
+            for (let i = 1; i < lines.length; i++) {
+                const cols = parseCSVRow(lines[i]);
+
+                const getCol = (name) => {
+                    const idx = colMap[name];
+                    if (idx === undefined || idx >= cols.length) return '';
+                    // Clean triple quotes and regular quotes
+                    let val = cols[idx] || '';
+                    val = val.replace(/^"""+|"""+$/g, '').replace(/^"+|"+$/g, '').trim();
+                    return val;
+                };
+
+                const type = getCol('Type');
+                const status = getCol('Status');
+                const amountStr = getCol('Amount (total)');
+
+                // Only include completed incoming payments
+                if (type !== 'Payment' || status !== 'Complete') continue;
+
+                const amount = parseCurrency(amountStr);
+                if (amount <= 0) continue;
+
+                const note = getCol('Note');
+                const from = getCol('From');
+                const date = getCol('Date');
+
+                // Auto-detect if this is Bruno-related
+                const isBruno = note.toLowerCase().includes('bruno');
+
+                payments.push({
+                    date: date,
+                    from: from,
+                    note: note,
+                    amount: amount,
+                    isBruno: isBruno
+                });
+            }
+
+            if (payments.length === 0) {
+                throw new Error('No incoming payments found in this Venmo statement.');
+            }
+
+            return payments;
+        }
+
+        // ==================== VENMO PAYMENTS TABLE ====================
+        function renderPaymentsTable() {
+            const showAll = document.getElementById('show-all-payments').checked;
+            const tbody = document.getElementById('payments-body');
+            tbody.innerHTML = '';
+
+            const filtered = showAll ? venmoPayments : venmoPayments.filter(p => p.isBruno);
+
+            for (let i = 0; i < venmoPayments.length; i++) {
+                const p = venmoPayments[i];
+                if (!showAll && !p.isBruno) continue;
+
+                const isUnmatched = p.isBruno && unmatchedBrunoPayments.includes(p);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="white-space:nowrap;">${escapeHTML(p.date)}</td>
+                    <td>${escapeHTML(p.from)}</td>
+                    <td class="payment-note" title="${escapeHTML(p.note)}">${escapeHTML(p.note)}</td>
+                    <td class="money">${formatCurrency(p.amount)}</td>
+                    <td class="center">
+                        <input type="checkbox" class="bruno-checkbox"
+                            ${p.isBruno ? 'checked' : ''}
+                            onchange="toggleBruno(${i}, this.checked)">
+                    </td>
+                    <td>${isUnmatched ? `<button class="create-rule-link" onclick="openRuleFromPayment(${i})">+ Rule</button>` : ''}</td>
+                `;
+                tbody.appendChild(tr);
+            }
+
+            // Update count
+            const brunoCount = venmoPayments.filter(p => p.isBruno).length;
+            document.getElementById('payment-count').textContent =
+                `${brunoCount} Bruno payment${brunoCount !== 1 ? 's' : ''}`;
+
+            // Update total
+            updateBrunoTotal();
+
+            document.getElementById('venmo-payments-card').style.display = 'block';
+        }
+
+        function toggleBruno(index, checked) {
+            venmoPayments[index].isBruno = checked;
+            updateBrunoTotal();
+
+            // Re-run auto-suggest and re-render reconciliation
+            autoSuggestPayments();
+            renderReconciliation();
+            renderRequests();
+
+            // Update count
+            const brunoCount = venmoPayments.filter(p => p.isBruno).length;
+            document.getElementById('payment-count').textContent =
+                `${brunoCount} Bruno payment${brunoCount !== 1 ? 's' : ''}`;
+        }
+
+        function updateBrunoTotal() {
+            const total = venmoPayments
+                .filter(p => p.isBruno)
+                .reduce((sum, p) => sum + p.amount, 0);
+            document.getElementById('bruno-payments-total').textContent = formatCurrency(total);
+        }
+
+        // ==================== RECONCILIATION ====================
+        function buildReconciliation() {
+            reconciliation = {};
+
+            for (const player of attendanceData) {
+                reconciliation[player.playerName] = {
+                    owed: player.owed,
+                    sessions: player.sessions,
+                    paid: 0,
+                    balance: player.owed
+                };
+            }
+
+            document.getElementById('recon-empty').style.display = 'none';
+            document.getElementById('recon-content').style.display = 'block';
+            document.getElementById('requests-empty').style.display = 'none';
+            document.getElementById('requests-content').style.display = 'block';
+
+            renderReconciliation();
+            renderRequests();
+        }
+
+        function autoSuggestPayments() {
+            if (attendanceData.length === 0 || venmoPayments.length === 0) return;
+
+            // Reset all paid amounts
+            for (const name of Object.keys(reconciliation)) {
+                reconciliation[name].paid = 0;
+            }
+
+            const brunoPayments = venmoPayments.filter(p => p.isBruno);
+            const usedPayments = new Set();
+
+            // Pass 0: Apply saved payment rules (e.g., "Jane Smith" -> "Combs, Emmett")
+            for (const payment of brunoPayments) {
+                const fromLower = payment.from.trim().toLowerCase();
+
+                // Find all rules where the Venmo sender matches
+                const matchingRules = paymentRules.filter(
+                    rule => rule.venmoName.trim().toLowerCase() === fromLower
+                );
+
+                if (matchingRules.length > 0) {
+                    // Only apply rules for players in this month's attendance
+                    const validRules = matchingRules.filter(
+                        rule => reconciliation[rule.playerName] !== undefined
+                    );
+
+                    if (validRules.length > 0) {
+                        const perPlayer = payment.amount / validRules.length;
+                        for (const rule of validRules) {
+                            reconciliation[rule.playerName].paid += perPlayer;
+                        }
+                        usedPayments.add(payment);
+                    }
+                }
+            }
+
+            // Pass 1: Match by player name appearing in the note
+            for (const payment of brunoPayments) {
+                if (usedPayments.has(payment)) continue;
+                const noteLower = payment.note.toLowerCase();
+                const matched = [];
+
+                for (const player of attendanceData) {
+                    const parts = player.playerName.split(',').map(p => p.trim().toLowerCase());
+                    const lastName = parts[0] || '';
+                    const firstName = parts[1] || '';
+
+                    // Check first name (must be 3+ chars to avoid false matches)
+                    const firstMatch = firstName.length >= 3 && noteLower.includes(firstName);
+                    // Check last name (must be 3+ chars)
+                    const lastMatch = lastName.length >= 3 && noteLower.includes(lastName);
+
+                    if (firstMatch || lastMatch) {
+                        matched.push(player.playerName);
+                    }
+                }
+
+                if (matched.length > 0) {
+                    // Split payment across matched players
+                    const perPlayer = payment.amount / matched.length;
+                    for (const name of matched) {
+                        reconciliation[name].paid += perPlayer;
+                    }
+                    usedPayments.add(payment);
+                }
+            }
+
+            // Pass 2: For unmatched Bruno payments, try matching "From" last name
+            for (const payment of brunoPayments) {
+                if (usedPayments.has(payment)) continue;
+
+                const fromParts = payment.from.trim().split(/\s+/);
+                if (fromParts.length < 2) continue;
+                const fromLast = fromParts[fromParts.length - 1].toLowerCase();
+
+                if (fromLast.length < 3) continue;
+
+                const matched = attendanceData.filter(p => {
+                    const playerLast = p.playerName.split(',')[0].trim().toLowerCase();
+                    return playerLast === fromLast;
+                });
+
+                if (matched.length > 0) {
+                    const perPlayer = payment.amount / matched.length;
+                    for (const player of matched) {
+                        reconciliation[player.playerName].paid += perPlayer;
+                    }
+                    usedPayments.add(payment);
+                }
+            }
+
+            // Update balances
+            for (const name of Object.keys(reconciliation)) {
+                const r = reconciliation[name];
+                r.paid = Math.round(r.paid * 100) / 100;  // Fix floating point
+                r.balance = r.owed - r.paid;
+            }
+
+            // Track unmatched Bruno payments (for "+ Rule" buttons in the table)
+            unmatchedBrunoPayments = brunoPayments.filter(p => !usedPayments.has(p));
+        }
+
+        function renderReconciliation() {
+            const tbody = document.getElementById('reconciliation-body');
+            tbody.innerHTML = '';
+
+            let totalOwed = 0;
+            let totalPaid = 0;
+            let totalBalance = 0;
+
+            const names = Object.keys(reconciliation).sort();
+
+            for (const name of names) {
+                const r = reconciliation[name];
+                const balance = r.owed - r.paid;
+                const rowClass = balance > 0 ? 'has-balance' : (balance <= 0 ? 'paid-up' : '');
+
+                const tr = document.createElement('tr');
+                tr.className = rowClass;
+                tr.innerHTML = `
+                    <td>${escapeHTML(name)}</td>
+                    <td class="money">${formatCurrency(r.owed)}</td>
+                    <td class="money">
+                        <input type="number" class="paid-input"
+                            value="${r.paid.toFixed(2)}"
+                            min="0" step="0.01"
+                            onchange="onPaidChange('${escapeHTML(name).replace(/'/g, "\\'")}', this)"
+                            oninput="onPaidInput('${escapeHTML(name).replace(/'/g, "\\'")}', this)">
+                    </td>
+                    <td class="money balance">${balance <= 0 && r.paid > 0 ? 'Paid' : formatCurrency(balance)}</td>
+                `;
+                tbody.appendChild(tr);
+
+                totalOwed += r.owed;
+                totalPaid += r.paid;
+                totalBalance += balance;
+            }
+
+            document.getElementById('recon-total-owed').textContent = formatCurrency(totalOwed);
+            document.getElementById('recon-total-paid').textContent = formatCurrency(totalPaid);
+            document.getElementById('recon-total-balance').textContent = formatCurrency(totalBalance);
+        }
+
+        function onPaidChange(playerName, input) {
+            let val = parseFloat(input.value);
+            if (isNaN(val) || val < 0) {
+                val = 0;
+                input.value = '0.00';
+                input.classList.add('error');
+                setTimeout(() => input.classList.remove('error'), 300);
+            }
+
+            reconciliation[playerName].paid = val;
+            reconciliation[playerName].balance = reconciliation[playerName].owed - val;
+
+            renderReconciliation();
+            renderRequests();
+
+            // Re-focus the input for this player (since we re-rendered)
+            const inputs = document.querySelectorAll('.paid-input');
+            const names = Object.keys(reconciliation).sort();
+            const idx = names.indexOf(playerName);
+            if (idx >= 0 && inputs[idx]) {
+                inputs[idx].focus();
+            }
+        }
+
+        function onPaidInput(playerName, input) {
+            // Live update balance as user types
+            let val = parseFloat(input.value);
+            if (isNaN(val)) val = 0;
+
+            const r = reconciliation[playerName];
+            const balance = r.owed - val;
+            const row = input.closest('tr');
+            const balanceTd = row.querySelector('.balance');
+
+            if (balance <= 0 && val > 0) {
+                balanceTd.textContent = 'Paid';
+                row.className = 'paid-up';
+            } else {
+                balanceTd.textContent = formatCurrency(balance);
+                row.className = balance > 0 ? 'has-balance' : '';
+            }
+
+            // Update totals
+            let totalPaid = 0;
+            let totalBalance = 0;
+            const names = Object.keys(reconciliation).sort();
+            const inputs = document.querySelectorAll('.paid-input');
+            for (let i = 0; i < names.length; i++) {
+                const paid = parseFloat(inputs[i]?.value) || 0;
+                totalPaid += paid;
+                totalBalance += reconciliation[names[i]].owed - paid;
+            }
+            document.getElementById('recon-total-paid').textContent = formatCurrency(totalPaid);
+            document.getElementById('recon-total-balance').textContent = formatCurrency(totalBalance);
+        }
+
+        // ==================== VENMO REQUESTS ====================
+        function renderRequests() {
+            const list = document.getElementById('requests-list');
+            list.innerHTML = '';
+
+            const names = Object.keys(reconciliation).sort();
+            const unpaid = names.filter(name => {
+                const r = reconciliation[name];
+                return (r.owed - r.paid) > 0;
+            });
+
+            if (unpaid.length === 0) {
+                document.getElementById('all-paid-msg').style.display = 'block';
+                document.getElementById('copy-all-btn').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('all-paid-msg').style.display = 'none';
+            document.getElementById('copy-all-btn').style.display = 'block';
+
+            for (const name of unpaid) {
+                const r = reconciliation[name];
+                const balance = r.owed - r.paid;
+                const message = generateRequestMessage(name, r.sessions, balance);
+
+                const div = document.createElement('div');
+                div.className = 'request-item';
+                div.innerHTML = `
+                    <div class="request-top">
+                        <span class="request-player">${escapeHTML(name)}</span>
+                        <span class="request-amount">${formatCurrency(balance)}</span>
+                    </div>
+                    <div class="request-message">${escapeHTML(message)}</div>
+                    <button class="copy-btn" onclick="copyToClipboard('${escapeJS(message)}', this)">Copy</button>
+                `;
+                list.appendChild(div);
+            }
+        }
+
+        function generateRequestMessage(playerName, sessions, balance) {
+            // Convert "Last, First" to "First Last" for a friendlier message
+            const parts = playerName.split(',').map(p => p.trim());
+            const friendlyName = parts.length > 1 ? `${parts[1]} ${parts[0]}` : parts[0];
+
+            return `IJTA Bruno Clinic - ${selectedMonth} - ${sessions} session${sessions !== 1 ? 's' : ''} - ${formatCurrency(balance)}`;
+        }
+
+        function copyToClipboard(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 1500);
+            }).catch(() => {
+                // Fallback: select text
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 1500);
+            });
+        }
+
+        function copyAllRequests() {
+            const names = Object.keys(reconciliation).sort();
+            const messages = [];
+
+            for (const name of names) {
+                const r = reconciliation[name];
+                const balance = r.owed - r.paid;
+                if (balance > 0) {
+                    messages.push(generateRequestMessage(name, r.sessions, balance));
+                }
+            }
+
+            const allText = messages.join('\n');
+            const btn = document.getElementById('copy-all-btn');
+
+            navigator.clipboard.writeText(allText).then(() => {
+                btn.textContent = 'All Copied!';
+                setTimeout(() => {
+                    btn.textContent = 'Copy All Requests';
+                }, 1500);
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = allText;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                btn.textContent = 'All Copied!';
+                setTimeout(() => {
+                    btn.textContent = 'Copy All Requests';
+                }, 1500);
+            });
+        }
+
+        // ==================== PAYMENT RULES MODAL ====================
+        function openRulesModal() {
+            // Populate the player dropdown from current attendance data
+            const select = document.getElementById('rule-player-name');
+            select.innerHTML = '<option value="">-- Select Player --</option>';
+
+            if (attendanceData.length > 0) {
+                for (const player of attendanceData) {
+                    const opt = document.createElement('option');
+                    opt.value = player.playerName;
+                    opt.textContent = player.playerName;
+                    select.appendChild(opt);
+                }
+            }
+
+            renderRulesList();
+            document.getElementById('rules-modal').style.display = 'flex';
+        }
+
+        function closeRulesModal() {
+            document.getElementById('rules-modal').style.display = 'none';
+        }
+
+        function closeRulesModalOutside(event) {
+            if (event.target === document.getElementById('rules-modal')) {
+                closeRulesModal();
+            }
+        }
+
+        function addPaymentRule() {
+            const venmoNameInput = document.getElementById('rule-venmo-name');
+            const playerSelect = document.getElementById('rule-player-name');
+            const venmoName = venmoNameInput.value.trim();
+            const playerName = playerSelect.value;
+
+            if (!venmoName) {
+                alert('Please enter the Venmo sender name.');
+                return;
+            }
+            if (!playerName) {
+                alert('Please select a player.');
+                return;
+            }
+
+            // Check for duplicate
+            const exists = paymentRules.some(
+                r => r.venmoName.toLowerCase() === venmoName.toLowerCase()
+                     && r.playerName === playerName
+            );
+            if (exists) {
+                alert('This rule already exists.');
+                return;
+            }
+
+            paymentRules.push({ venmoName, playerName });
+            savePaymentRules();
+
+            // Clear form
+            venmoNameInput.value = '';
+            playerSelect.value = '';
+
+            renderRulesList();
+
+            // Re-run matching if we have data
+            if (attendanceData.length > 0 && venmoPayments.length > 0) {
+                autoSuggestPayments();
+                renderPaymentsTable();
+                renderReconciliation();
+                renderRequests();
+            }
+        }
+
+        function deletePaymentRule(index) {
+            paymentRules.splice(index, 1);
+            savePaymentRules();
+            renderRulesList();
+
+            // Re-run matching if we have data
+            if (attendanceData.length > 0 && venmoPayments.length > 0) {
+                autoSuggestPayments();
+                renderPaymentsTable();
+                renderReconciliation();
+                renderRequests();
+            }
+        }
+
+        function renderRulesList() {
+            const container = document.getElementById('rules-list');
+            const emptyEl = document.getElementById('rules-empty');
+            container.innerHTML = '';
+
+            if (paymentRules.length === 0) {
+                emptyEl.style.display = 'block';
+                return;
+            }
+
+            emptyEl.style.display = 'none';
+
+            for (let i = 0; i < paymentRules.length; i++) {
+                const rule = paymentRules[i];
+                const div = document.createElement('div');
+                div.className = 'rule-item';
+                div.innerHTML = `
+                    <div class="rule-info">
+                        <span class="rule-from">${escapeHTML(rule.venmoName)}</span>
+                        <span class="rule-arrow">&#8594;</span>
+                        <span class="rule-player">${escapeHTML(rule.playerName)}</span>
+                    </div>
+                    <button class="rule-delete" onclick="deletePaymentRule(${i})" title="Delete rule">
+                        &times;
+                    </button>
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        function openRuleFromPayment(paymentIndex) {
+            const payment = venmoPayments[paymentIndex];
+
+            // Pre-fill the modal form with the Venmo sender name
+            document.getElementById('rule-venmo-name').value = payment.from;
+
+            // Open the modal (which populates the player dropdown)
+            openRulesModal();
+
+            // Focus the sender name field so user can see what's pre-filled
+            document.getElementById('rule-venmo-name').focus();
+        }
+
+        // ==================== UTILITY ====================
+        function formatCurrency(amount) {
+            return '$' + Math.abs(amount).toFixed(2);
+        }
+
+        function parseCurrency(str) {
+            if (!str) return 0;
+            const negative = str.trim().startsWith('-');
+            const cleaned = str.replace(/[^0-9.]/g, '');
+            let val = parseFloat(cleaned);
+            if (isNaN(val)) return 0;
+            return negative ? -val : val;
+        }
+
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function escapeJS(str) {
+            return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+        }
+    </script>
+</body>
+</html>
