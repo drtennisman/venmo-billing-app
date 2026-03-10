@@ -474,6 +474,53 @@
             color: #2e7d32;
         }
 
+        /* ==================== VENMO BUTTON ==================== */
+        .venmo-btn {
+            padding: 8px 16px;
+            background: #008CFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .venmo-btn:active {
+            background: #0070CC;
+        }
+
+        .request-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .add-venmo-link {
+            background: none;
+            border: none;
+            color: #008CFF;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 0;
+            text-decoration: underline;
+        }
+
+        .add-venmo-link:active {
+            color: #0070CC;
+        }
+
+        .venmo-username {
+            color: #008CFF;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
         /* ==================== HELP TEXT ==================== */
         .help-text {
             font-size: 13px;
@@ -791,6 +838,17 @@
                 flex-direction: column;
                 gap: 8px;
             }
+
+            .request-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .request-buttons .venmo-btn,
+            .request-buttons .copy-btn {
+                width: 100%;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -840,6 +898,7 @@
                     <div class="subtitle" id="billing-period"></div>
                 </div>
                 <button class="rules-btn" onclick="openRulesModal()" title="Payment Rules">&#9881;</button>
+                <button class="rules-btn" onclick="openVenmoModal()" title="Venmo Usernames" style="font-size: 14px; font-weight: 700; background: rgba(0,140,255,0.25); border-color: rgba(0,140,255,0.4);">V</button>
             </div>
         </div>
         <div class="container">
@@ -1001,6 +1060,44 @@
             </div>
         </div>
 
+        <!-- Venmo Usernames Modal -->
+        <div id="venmo-modal" class="modal-overlay" style="display:none;" onclick="closeVenmoModalOutside(event)">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Venmo Usernames</h2>
+                    <button class="modal-close" onclick="closeVenmoModal()">&times;</button>
+                </div>
+                <p class="modal-help">
+                    Map each player to their Venmo username so you can request payments directly through Venmo. The username is the part after venmo.com/ in their profile URL (e.g. "Jane-Smith-1").
+                </p>
+
+                <!-- Add/edit form -->
+                <div class="rule-form">
+                    <div class="rule-form-row">
+                        <div class="rule-form-field">
+                            <label for="venmo-player-select">Player</label>
+                            <select id="venmo-player-select">
+                                <option value="">-- Select Player --</option>
+                            </select>
+                        </div>
+                        <div class="rule-form-field">
+                            <label for="venmo-username-input">Venmo Username</label>
+                            <input type="text" id="venmo-username-input" placeholder="e.g. Jane-Smith-1">
+                        </div>
+                    </div>
+                    <button class="primary-btn rule-add-btn" onclick="addVenmoUsername()">Save Username</button>
+                </div>
+
+                <!-- Existing mappings list -->
+                <div id="venmo-list"></div>
+
+                <!-- Empty state -->
+                <div id="venmo-empty" class="rules-empty">
+                    No Venmo usernames mapped yet. Add one above.
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -1019,6 +1116,7 @@
         let venmoPayments = [];        // [{ date, from, note, amount, isBruno }]
         let reconciliation = {};       // { playerName: { owed, paid, balance } }
         let paymentRules = [];         // [{ venmoName, playerName }] — saved in localStorage
+        let venmoUsernames = [];       // [{ playerName, venmoUsername }] — saved in localStorage
         let unmatchedBrunoPayments = []; // Bruno payments not matched by any pass
 
         // ==================== LOCALSTORAGE HELPERS ====================
@@ -1035,11 +1133,25 @@
             localStorage.setItem('ijtaBillingPaymentRules', JSON.stringify(paymentRules));
         }
 
+        function loadVenmoUsernames() {
+            try {
+                const saved = localStorage.getItem('ijtaBillingVenmoUsernames');
+                venmoUsernames = saved ? JSON.parse(saved) : [];
+            } catch (e) {
+                venmoUsernames = [];
+            }
+        }
+
+        function saveVenmoUsernames() {
+            localStorage.setItem('ijtaBillingVenmoUsernames', JSON.stringify(venmoUsernames));
+        }
+
         // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', () => {
             populateMonthSelects();
             setupDragDrop();
             loadPaymentRules();
+            loadVenmoUsernames();
         });
 
         function populateMonthSelects() {
@@ -1722,6 +1834,15 @@
                 const r = reconciliation[name];
                 const balance = r.owed - r.paid;
                 const message = generateRequestMessage(name, r.sessions, balance);
+                const venmoUser = getVenmoUsername(name);
+
+                let venmoButtonHTML;
+                if (venmoUser) {
+                    const venmoLink = buildVenmoLink(venmoUser, balance, message);
+                    venmoButtonHTML = `<a class="venmo-btn" href="${escapeHTML(venmoLink)}" target="_blank" rel="noopener noreferrer">Request on Venmo</a>`;
+                } else {
+                    venmoButtonHTML = `<button class="add-venmo-link" onclick="openVenmoModalForPlayer('${escapeJS(name)}')">+ Add Venmo</button>`;
+                }
 
                 const div = document.createElement('div');
                 div.className = 'request-item';
@@ -1731,7 +1852,10 @@
                         <span class="request-amount">${formatCurrency(balance)}</span>
                     </div>
                     <div class="request-message">${escapeHTML(message)}</div>
-                    <button class="copy-btn" onclick="copyToClipboard('${escapeJS(message)}', this)">Copy</button>
+                    <div class="request-buttons">
+                        <button class="copy-btn" onclick="copyToClipboard('${escapeJS(message)}', this)">Copy</button>
+                        ${venmoButtonHTML}
+                    </div>
                 `;
                 list.appendChild(div);
             }
@@ -1931,6 +2055,133 @@
 
             // Focus the sender name field so user can see what's pre-filled
             document.getElementById('rule-venmo-name').focus();
+        }
+
+        // ==================== VENMO USERNAMES MODAL ====================
+        function getVenmoUsername(playerName) {
+            const mapping = venmoUsernames.find(v => v.playerName === playerName);
+            return mapping ? mapping.venmoUsername : null;
+        }
+
+        function buildVenmoLink(venmoUsername, amount, message) {
+            const params = new URLSearchParams({
+                txn: 'charge',
+                audience: 'private',
+                recipients: venmoUsername,
+                amount: amount.toFixed(2),
+                note: message
+            });
+            return 'https://venmo.com/?' + params.toString();
+        }
+
+        function openVenmoModal() {
+            const select = document.getElementById('venmo-player-select');
+            select.innerHTML = '<option value="">-- Select Player --</option>';
+
+            if (attendanceData.length > 0) {
+                for (const player of attendanceData) {
+                    const opt = document.createElement('option');
+                    opt.value = player.playerName;
+                    opt.textContent = player.playerName;
+                    select.appendChild(opt);
+                }
+            }
+
+            document.getElementById('venmo-username-input').value = '';
+            renderVenmoList();
+            document.getElementById('venmo-modal').style.display = 'flex';
+        }
+
+        function openVenmoModalForPlayer(playerName) {
+            openVenmoModal();
+            document.getElementById('venmo-player-select').value = playerName;
+            document.getElementById('venmo-username-input').focus();
+        }
+
+        function closeVenmoModal() {
+            document.getElementById('venmo-modal').style.display = 'none';
+        }
+
+        function closeVenmoModalOutside(event) {
+            if (event.target === document.getElementById('venmo-modal')) {
+                closeVenmoModal();
+            }
+        }
+
+        function addVenmoUsername() {
+            const playerSelect = document.getElementById('venmo-player-select');
+            const usernameInput = document.getElementById('venmo-username-input');
+            const playerName = playerSelect.value;
+            const venmoUsername = usernameInput.value.trim().replace(/^@/, '');
+
+            if (!playerName) {
+                alert('Please select a player.');
+                return;
+            }
+            if (!venmoUsername) {
+                alert('Please enter a Venmo username.');
+                return;
+            }
+
+            // Update if player already has a mapping, otherwise add new
+            const existingIndex = venmoUsernames.findIndex(v => v.playerName === playerName);
+            if (existingIndex >= 0) {
+                venmoUsernames[existingIndex].venmoUsername = venmoUsername;
+            } else {
+                venmoUsernames.push({ playerName, venmoUsername });
+            }
+
+            saveVenmoUsernames();
+
+            playerSelect.value = '';
+            usernameInput.value = '';
+
+            renderVenmoList();
+
+            // Re-render requests so the Venmo button appears
+            if (Object.keys(reconciliation).length > 0) {
+                renderRequests();
+            }
+        }
+
+        function deleteVenmoUsername(index) {
+            venmoUsernames.splice(index, 1);
+            saveVenmoUsernames();
+            renderVenmoList();
+
+            if (Object.keys(reconciliation).length > 0) {
+                renderRequests();
+            }
+        }
+
+        function renderVenmoList() {
+            const container = document.getElementById('venmo-list');
+            const emptyEl = document.getElementById('venmo-empty');
+            container.innerHTML = '';
+
+            if (venmoUsernames.length === 0) {
+                emptyEl.style.display = 'block';
+                return;
+            }
+
+            emptyEl.style.display = 'none';
+
+            for (let i = 0; i < venmoUsernames.length; i++) {
+                const mapping = venmoUsernames[i];
+                const div = document.createElement('div');
+                div.className = 'rule-item';
+                div.innerHTML = `
+                    <div class="rule-info">
+                        <span class="rule-from">${escapeHTML(mapping.playerName)}</span>
+                        <span class="rule-arrow">&#8594;</span>
+                        <span class="venmo-username">@${escapeHTML(mapping.venmoUsername)}</span>
+                    </div>
+                    <button class="rule-delete" onclick="deleteVenmoUsername(${i})" title="Delete mapping">
+                        &times;
+                    </button>
+                `;
+                container.appendChild(div);
+            }
         }
 
         // ==================== UTILITY ====================
