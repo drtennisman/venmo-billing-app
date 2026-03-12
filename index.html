@@ -1014,6 +1014,9 @@
                     <button id="copy-all-btn" class="primary-btn" onclick="copyAllRequests()" style="display:none;">
                         Copy All Requests
                     </button>
+                    <button id="text-btn" class="primary-btn" onclick="textRequestsToPhone()" style="display:none; background: #008CFF;">
+                        Text Requests to My Phone
+                    </button>
                     <div id="all-paid-msg" class="empty-state" style="display:none;">
                         All players are paid up! No requests needed.
                     </div>
@@ -1824,11 +1827,13 @@
             if (unpaid.length === 0) {
                 document.getElementById('all-paid-msg').style.display = 'block';
                 document.getElementById('copy-all-btn').style.display = 'none';
+                document.getElementById('text-btn').style.display = 'none';
                 return;
             }
 
             document.getElementById('all-paid-msg').style.display = 'none';
             document.getElementById('copy-all-btn').style.display = 'block';
+            document.getElementById('text-btn').style.display = 'block';
 
             for (const name of unpaid) {
                 const r = reconciliation[name];
@@ -1929,6 +1934,35 @@
                     btn.textContent = 'Copy All Requests';
                 }, 1500);
             });
+        }
+
+        // ==================== TEXT TO PHONE ====================
+        function textRequestsToPhone() {
+            const names = Object.keys(reconciliation).sort();
+            const lines = [];
+
+            lines.push(`IJTA Bruno Billing - ${selectedMonth}`);
+            lines.push('');
+
+            for (const name of names) {
+                const r = reconciliation[name];
+                const balance = r.owed - r.paid;
+                if (balance <= 0) continue;
+
+                const message = generateRequestMessage(name, r.sessions, r.owed, r.paid, balance);
+                const venmoUser = getVenmoUsername(name);
+
+                lines.push(message);
+                if (venmoUser) {
+                    const venmoLink = buildVenmoLink(venmoUser, balance, message);
+                    lines.push(venmoLink);
+                }
+                lines.push('');
+            }
+
+            const body = lines.join('\n');
+            // sms: with &body= opens iMessage on Mac with the message pre-filled
+            window.location.href = 'sms:&body=' + encodeURIComponent(body);
         }
 
         // ==================== PAYMENT RULES MODAL ====================
