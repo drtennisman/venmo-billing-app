@@ -1833,7 +1833,7 @@
             for (const name of unpaid) {
                 const r = reconciliation[name];
                 const balance = r.owed - r.paid;
-                const message = generateRequestMessage(name, r.sessions, balance);
+                const message = generateRequestMessage(name, r.sessions, r.owed, r.paid, balance);
                 const venmoUser = getVenmoUsername(name);
 
                 let venmoButtonHTML;
@@ -1861,11 +1861,14 @@
             }
         }
 
-        function generateRequestMessage(playerName, sessions, balance) {
+        function generateRequestMessage(playerName, sessions, owed, paid, balance) {
             // Convert "Last, First" to "First Last" for a friendlier message
             const parts = playerName.split(',').map(p => p.trim());
             const friendlyName = parts.length > 1 ? `${parts[1]} ${parts[0]}` : parts[0];
 
+            if (paid > 0) {
+                return `IJTA Bruno Clinic - ${selectedMonth} - ${sessions} session${sessions !== 1 ? 's' : ''} (${formatCurrency(owed)}) - ${formatCurrency(paid)} received - Balance: ${formatCurrency(balance)}`;
+            }
             return `IJTA Bruno Clinic - ${selectedMonth} - ${sessions} session${sessions !== 1 ? 's' : ''} - ${formatCurrency(balance)}`;
         }
 
@@ -1902,7 +1905,7 @@
                 const r = reconciliation[name];
                 const balance = r.owed - r.paid;
                 if (balance > 0) {
-                    messages.push(generateRequestMessage(name, r.sessions, balance));
+                    messages.push(generateRequestMessage(name, r.sessions, r.owed, r.paid, balance));
                 }
             }
 
