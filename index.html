@@ -1162,12 +1162,17 @@
             const monthSelect = document.getElementById('month-select');
             const yearSelect = document.getElementById('year-select');
 
+            // Default to previous month (since you're usually billing for last month)
+            const prevMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            const defaultMonth = prevMonthDate.getMonth();
+            const defaultYear = prevMonthDate.getFullYear();
+
             // Months
             MONTH_NAMES.forEach((name, i) => {
                 const opt = document.createElement('option');
                 opt.value = i;
                 opt.textContent = name;
-                if (i === now.getMonth()) opt.selected = true;
+                if (i === defaultMonth) opt.selected = true;
                 monthSelect.appendChild(opt);
             });
 
@@ -1176,7 +1181,7 @@
                 const opt = document.createElement('option');
                 opt.value = y;
                 opt.textContent = y;
-                if (y === now.getFullYear()) opt.selected = true;
+                if (y === defaultYear) opt.selected = true;
                 yearSelect.appendChild(opt);
             }
         }
@@ -1959,7 +1964,8 @@
 
             const subject = `IJTA Bruno Billing - ${selectedMonth}`;
             const body = lines.join('\n');
-            window.location.href = 'mailto:invernessjuniortennisacademy@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+            const gmailUrl = 'https://mail.google.com/mail/?view=cm&to=invernessjuniortennisacademy@gmail.com&su=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+            window.open(gmailUrl, '_blank');
         }
 
         // ==================== PAYMENT RULES MODAL ====================
