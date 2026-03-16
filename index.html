@@ -1645,14 +1645,15 @@
                 const status = getCol('Status');
                 const amountStr = getCol('Amount (total)');
 
-                // Only include completed incoming payments
-                if (type !== 'Payment' || status !== 'Complete') continue;
+                // Only include completed incoming payments (Payment = someone paid you, Charge = your request was paid)
+                if ((type !== 'Payment' && type !== 'Charge') || status !== 'Complete') continue;
 
                 const amount = parseCurrency(amountStr);
                 if (amount <= 0) continue;
 
                 const note = getCol('Note');
-                const from = getCol('From');
+                // For Charges (requests you sent), the payer is in "To"; for Payments, in "From"
+                const from = type === 'Charge' ? getCol('To') : getCol('From');
                 const date = getCol('Date');
                 const txnId = getCol('ID') || getCol('Transaction ID') || '';
 
